@@ -641,20 +641,33 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4vw;
-    align-items: end;
+    align-items: start;
     padding-top: 4vh;
     border-top: 1px solid rgba(240,255,190,.15);
   }
-  .contact-details { display: flex; flex-direction: column; gap: 28px; }
+  .contact-details { display: flex; flex-direction: column; gap: 40px; }
   .contact-detail-item { display: flex; gap: 16px; align-items: flex-start; }
   .contact-num {
-    font-size: 16px; color: var(--olive);
-    flex-shrink: 0; margin-top: 2px; line-height: 1;
+    font-size: clamp(22px, 2.5vw, 36px); color: var(--olive);
+    flex-shrink: 0; margin-top: 6px; line-height: 1;
   }
   .contact-detail-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--olive); margin-bottom: 4px;
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: clamp(40px, 7vw, 96px);
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 8px;
+    margin-bottom: 6px;
+    transition: color .15s, text-decoration-color .15s;
+  }
+  .contact-detail-label:hover {
+    color: var(--blush);
+    text-decoration-color: var(--blush);
   }
   .contact-detail-value {
     font-size: 16px; color: var(--ink); margin-bottom: 4px; line-height: 1.75;
@@ -812,18 +825,12 @@
 <section class="section contact" id="contact">
   <div class="eyebrow">04 · Contact</div>
 
-  <nav class="contact-links" aria-label="Contact links">
-    <a href="mailto:siddhidmahajan@gmail.com" class="contact-big-link">Email</a>
-    <a href="https://www.linkedin.com/in/siddhi-mahajan" target="_blank" rel="noopener noreferrer" class="contact-big-link">LinkedIn</a>
-    <a href="https://github.com/SiddhiMahajan594" target="_blank" rel="noopener noreferrer" class="contact-big-link">GitHub</a>
-  </nav>
-
   <div class="contact-bottom">
     <div class="contact-details">
       <div class="contact-detail-item">
         <span class="contact-num">①</span>
         <div class="contact-detail-body">
-          <div class="contact-detail-label">Email</div>
+          <a class="contact-detail-label" href="mailto:siddhidmahajan@gmail.com">EMAIL</a>
           <div class="contact-detail-value">siddhidmahajan@gmail.com</div>
           <div class="contact-detail-note">Best way to reach me, I reply fast.</div>
         </div>
@@ -831,7 +838,7 @@
       <div class="contact-detail-item">
         <span class="contact-num">②</span>
         <div class="contact-detail-body">
-          <div class="contact-detail-label">LinkedIn</div>
+          <a class="contact-detail-label" href="https://www.linkedin.com/in/siddhi-mahajan" target="_blank" rel="noopener noreferrer">LINKEDIN</a>
           <div class="contact-detail-value">/in/siddhi-mahajan</div>
           <div class="contact-detail-note">Connect for roles or research.</div>
         </div>
@@ -839,7 +846,7 @@
       <div class="contact-detail-item">
         <span class="contact-num">③</span>
         <div class="contact-detail-body">
-          <div class="contact-detail-label">GitHub</div>
+          <a class="contact-detail-label" href="https://github.com/SiddhiMahajan594" target="_blank" rel="noopener noreferrer">GITHUB</a>
           <div class="contact-detail-value">/SiddhiMahajan594</div>
           <div class="contact-detail-note">All my projects live here.</div>
         </div>
@@ -985,31 +992,15 @@ document.getElementById("muteBtn").addEventListener("click", () => {
 
 function heroAssemble() {
   const keys = allKeys();
-  // start state: scatter every key to random off-grid positions
-  gsap.set(keys, {
-    opacity: 0,
-    x: () => gsap.utils.random(-window.innerWidth*0.7, window.innerWidth*0.7),
-    y: () => gsap.utils.random(-window.innerHeight*0.8, window.innerHeight*0.8),
-    rotation: () => gsap.utils.random(-540, 540),
-    scale: () => gsap.utils.random(0.3, 1.4),
-    transformOrigin: "50% 50%"
-  });
+  // Show keyboard immediately — no fly-in animation
+  gsap.set(keys, { opacity: 1, x: 0, y: 0, rotation: 0, scale: 1 });
 
   const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-  tl.to(keys, {
-    opacity: 1,
-    x: 0,
-    y: 0,
-    rotation: 0,
-    scale: 1,
-    duration: 1.2,
-    stagger: { amount: 1.2, from: "random" }
-  })
-  .to("#heroFooter", { opacity: 1, duration: 0.5 }, "-=0.4")
-  .to(".top-nav .brand", { opacity: 1, duration: 0.4 }, "-=0.3")
-  .to(".nav-slot", { opacity: 1, duration: 0.5, stagger: 0.06 }, "-=0.3")
-  .add(() => typeName(), "-=0.2")
-  .add(() => flyNavKeys(), "+=0.5");
+  tl.to("#heroFooter", { opacity: 1, duration: 0.5 })
+    .to(".top-nav .brand", { opacity: 1, duration: 0.4 }, "-=0.3")
+    .to(".nav-slot", { opacity: 1, duration: 0.5, stagger: 0.06 }, "-=0.3")
+    .add(() => typeName(), "+=0.1")
+    .add(() => flyNavKeys(), "+=0.5");
 
   return tl;
 }
