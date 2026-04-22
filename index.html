@@ -1257,33 +1257,37 @@ function initScrollAnimations() {
 
   // Projects: populate folder grid, animate in
   const projectsEl = document.getElementById("projects");
-  gsap.from(".folder", {
-    opacity: 0,
-    y: 40,
-    scale: 0.92,
-    duration: 0.6,
-    stagger: 0.08,
-    ease: "power2.out",
-    scrollTrigger: {
-      trigger: projectsEl,
-      start: "top 55%"
-    }
-  });
-
-  // CRT entrance — grows from tiny as user enters projects (desktop only)
-  if (window.innerWidth > 900) {
-    gsap.from("#bigCrt", {
-      scale: 0.12,
-      opacity: 0,
-      y: -80,
-      duration: 1.1,
-      ease: "power3.out",
+  gsap.fromTo(".folder",
+    { opacity: 0, y: 30 },
+    {
+      opacity: 1,
+      y: 0,
+      duration: 0.5,
+      stagger: 0.07,
+      ease: "power2.out",
       scrollTrigger: {
         trigger: projectsEl,
-        start: "top 80%"
+        start: "top 55%",
+        once: true
       }
-    });
-  }
+    }
+  );
+
+  // CRT entrance — fade + slight rise (no scale, avoids content reflow)
+  gsap.fromTo("#bigCrt",
+    { opacity: 0, y: 40 },
+    {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: projectsEl,
+        start: "top 70%",
+        once: true
+      }
+    }
+  );
 
   /* ---- SKILLS: rain keys, then settle into grid ---- */
   const skillsEl = document.getElementById("skills");
@@ -1404,21 +1408,21 @@ const PROJECTS = [
   },
   {
     title: "Sustainable CNN Evaluation",
-    year: "2024", ext: "ML", url: "",
+    year: "2024", ext: "ML", url: "https://github.com/SiddhiMahajan594/Carbon-Aware-ML-Training",
     desc: "Federated vs centralized CNNs on CIFAR-10 with attention + energy-efficient losses. Integrated CodeCarbon to measure CO₂.",
     stack: ["PyTorch", "NumPy", "scikit-learn", "Colab"],
     outcome: "Best Paper @ IRTM 2025 · Federated privacy-preserving learning"
   },
   {
     title: "Electron Orbital Cipher",
-    year: "2024", ext: "AES", url: "",
+    year: "2024", ext: "AES", url: "https://github.com/SiddhiMahajan594/electron-cipher",
     desc: "Hybrid AES cipher using electron-orbital logic + SHA-256-derived dynamic S-boxes. Visualization tool for bit-level transforms.",
     stack: ["Python", "PyCryptodome", "Matplotlib"],
     outcome: "Targeting IEEE INDICON · SHA-256 dynamic S-box generation"
   },
   {
     title: "Turf Booking — Web + Android",
-    year: "2023", ext: "APP", url: "",
+    year: "2023", ext: "APP", url: "https://github.com/SiddhiMahajan594/Turfapp",
     desc: "Cross-platform turf booking with auth, team management, and real-time Firebase data. Built matching REST APIs for both clients.",
     stack: ["JS", "PHP", "Java", "Firebase", "MySQL"],
     outcome: "Live on Android + Web · RESTful API across both platforms"
@@ -1432,7 +1436,7 @@ const PROJECTS = [
   },
   {
     title: "ThouSpeak — Shakespeare NLP Chatbot",
-    year: "2023", ext: "NLP", url: "",
+    year: "2023", ext: "NLP", url: "https://github.com/SiddhiMahajan594/NLP-Mini-Project-Shakesphere-Chatbot",
     desc: "NLP chatbot generating Shakespearean dialogue via TF-IDF vectorization and contextual response modeling with speech synthesis.",
     stack: ["Python", "NLTK", "Flask"],
     outcome: "TF-IDF vectorization · Flask backend · speech synthesis"
@@ -1443,12 +1447,14 @@ function renderFolders() {
   const grid = document.getElementById("folderGrid");
   grid.innerHTML = "";
   PROJECTS.forEach(p => {
-    const a = document.createElement("a");
-    a.href = p.url || "#";
-    a.className = "folder";
-    a.dataset.stack = p.stack.join(",");
-    a.innerHTML = `
-      <a class="folder-gh-link" href="${p.url || "#"}" aria-label="View project">↗</a>
+    /* Use <div> not <a> as the card wrapper — nested <a> inside <a> is
+       invalid HTML and causes browsers to strip elements unpredictably,
+       producing inconsistent layout on each render. */
+    const card = document.createElement("div");
+    card.className = "folder";
+    card.dataset.stack = p.stack.join(",");
+    card.innerHTML = `
+      <a class="folder-gh-link" href="${p.url || "#"}" aria-label="View project" ${p.url ? 'target="_blank" rel="noopener noreferrer"' : ''}>↗</a>
       <div class="icon" data-ext="${p.ext}"></div>
       <h3>${p.title}</h3>
       <div class="meta">· ${p.year}</div>
@@ -1456,7 +1462,7 @@ function renderFolders() {
       <em class="folder-outcome">${p.outcome}</em>
       <div class="stack">${p.stack.map(s => `<span>${s}</span>`).join("")}</div>
     `;
-    grid.appendChild(a);
+    grid.appendChild(card);
   });
 }
 
